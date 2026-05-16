@@ -1,0 +1,32 @@
+{
+  "name": "Note",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Note title"
+    },
+    "content": {
+      "type": "string",
+      "description": "Note content in markdown"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Related subject"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for organization"
+    },
+    "file_url": {
+      "type": "string",
+      "description": "Attached file URL"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

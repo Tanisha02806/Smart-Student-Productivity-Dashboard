@@ -1,0 +1,23 @@
+{
+  "name": "Attendance",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "Subject or course name"
+    },
+    "total_classes": {
+      "type": "number",
+      "description": "Total number of classes"
+    },
+    "attended_classes": {
+      "type": "number",
+      "description": "Number of classes attended"
+    }
+  },
+  "required": [
+    "subject",
+    "total_classes",
+    "attended_classes"
+  ]
+}

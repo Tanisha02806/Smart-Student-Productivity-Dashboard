@@ -1,0 +1,47 @@
+{
+  "name": "Assignment",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Assignment title"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Subject or course name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Assignment details"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "todo",
+        "in_progress",
+        "completed"
+      ],
+      "default": "todo",
+      "description": "Current status"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium",
+      "description": "Priority level"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Deadline"
+    }
+  },
+  "required": [
+    "title",
+    "subject"
+  ]
+}

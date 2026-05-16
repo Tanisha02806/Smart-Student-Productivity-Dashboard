@@ -1,0 +1,37 @@
+{
+  "name": "FocusSession",
+  "type": "object",
+  "properties": {
+    "duration_minutes": {
+      "type": "number",
+      "description": "Duration in minutes"
+    },
+    "session_type": {
+      "type": "string",
+      "enum": [
+        "focus",
+        "break"
+      ],
+      "default": "focus",
+      "description": "Type of session"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Subject studied"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether session was completed"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Session date"
+    }
+  },
+  "required": [
+    "duration_minutes",
+    "session_type"
+  ]
+}
