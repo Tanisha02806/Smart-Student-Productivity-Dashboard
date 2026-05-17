@@ -13,7 +13,7 @@ import {
   GraduationCap,
   LogOut
 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { base44 } from "@/api/api";
 import { cn } from "@/lib/utils";
 
 const navItems = [
