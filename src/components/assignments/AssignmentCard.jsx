@@ -1,10 +1,10 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Badge } from "../ui/badge";
+import { Button } from "../ui/button";
 import { format } from "date-fns";
 import { Calendar, Trash2, ArrowRight } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 const priorityStyles = {
   high: "bg-destructive/10 text-destructive",

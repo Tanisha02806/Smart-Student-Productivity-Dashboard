@@ -13,8 +13,8 @@ import {
   GraduationCap,
   LogOut
 } from "lucide-react";
-import { base44 } from "@/api/api";
-import { cn } from "@/lib/utils";
+import api from "../../api/api";
+import { cn } from "../../lib/utils";
 
 const navItems = [
   { path: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -97,7 +97,7 @@ export default function Sidebar() {
       {/* Footer */}
       <div className="p-3 border-t border-border space-y-1">
         <button
-          onClick={() => base44.auth.logout()}
+          onClick={() => api.post("/logout")}
           className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all w-full"
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />

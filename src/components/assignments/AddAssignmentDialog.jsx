@@ -1,18 +1,37 @@
-import React, { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { Label } from "../ui/label";
 import { Plus } from "lucide-react";
 
+const AnyDialog = /** @type {any} */ (Dialog);
+const AnyDialogContent = /** @type {any} */ (DialogContent);
+const AnyDialogHeader = /** @type {any} */ (DialogHeader);
+const AnyDialogTitle = /** @type {any} */ (DialogTitle);
+const AnyDialogTrigger = /** @type {any} */ (DialogTrigger);
+const AnyButton = /** @type {any} */ (Button);
+const AnyInput = /** @type {any} */ (Input);
+const AnyTextarea = /** @type {any} */ (Textarea);
+const AnySelect = /** @type {any} */ (Select);
+const AnySelectContent = /** @type {any} */ (SelectContent);
+const AnySelectItem = /** @type {any} */ (SelectItem);
+const AnySelectTrigger = /** @type {any} */ (SelectTrigger);
+const AnySelectValue = /** @type {any} */ (SelectValue);
+const AnyLabel = /** @type {any} */ (Label);
+
+/**
+ * @param {{ onAdd: (assignment: any) => Promise<void> | void }} props
+ */
 export default function AddAssignmentDialog({ onAdd }) {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     title: "", subject: "", description: "", priority: "medium", due_date: "", status: "todo"
   });
 
+  /** @param {import("react").FormEvent<HTMLFormElement>} e */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.title || !form.subject) return;

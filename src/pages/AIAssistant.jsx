@@ -1,9 +1,6 @@
-import React, { useState } from "react";
-import { base44 } from "@/api/api";
+import { useState } from "react";
+import api from "../api/api";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Loader2, BookOpen, HelpCircle, Layers } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
@@ -19,19 +16,30 @@ export default function AIAssistant() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
+  /** @param {import("react").ChangeEvent<HTMLTextAreaElement>} e */
+  const handleInputChange = (e) => {
+    setInput(e.target.value);
+  };
+
   const handleGenerate = async () => {
     if (!input.trim()) return;
     setLoading(true);
     setResult("");
-    const currentMode = modes.find((m) => m.key === mode);
-    const response = await base44.integrations.Core.InvokeLLM({
-      prompt: currentMode.prompt + input,
-    });
-    setResult(response);
-    setLoading(false);
+    const currentMode = modes.find((m) => m.key === mode) || modes[0];
+
+    try {
+      const response = await api.post("/ai", {
+        prompt: currentMode.prompt + input,
+      });
+      setResult(response?.data ?? response ?? "");
+    } catch (error) {
+      setResult("Failed to generate AI content. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const currentMode = modes.find((m) => m.key === mode);
+  const currentMode = modes.find((m) => m.key === mode) || modes[0];
 
   return (
     <div className="space-y-6">
@@ -51,34 +59,38 @@ export default function AIAssistant() {
           {/* Mode Selector */}
           <div className="flex flex-wrap gap-2">
             {modes.map((m) => (
-              <Button
+              <button
                 key={m.key}
-                variant={mode === m.key ? "default" : "outline"}
-                size="sm"
-                className="gap-2"
+                type="button"
+                className={`inline-flex items-center justify-center gap-2 rounded-full border px-3 py-1 text-sm font-medium transition ${
+                  mode === m.key
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-transparent text-muted-foreground hover:border-primary hover:text-primary"
+                }`}
                 onClick={() => setMode(m.key)}
               >
                 <m.icon className="w-4 h-4" />
                 {m.label}
-              </Button>
+              </button>
             ))}
           </div>
 
-          <Textarea
+          <textarea
             placeholder="Paste your study material, notes, or text here..."
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            className="h-64 font-mono text-sm"
+            onChange={handleInputChange}
+            className="w-full h-64 rounded-2xl border border-border bg-transparent px-4 py-3 font-mono text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
 
-          <Button
+          <button
+            type="button"
             onClick={handleGenerate}
             disabled={loading || !input.trim()}
-            className="w-full gap-2"
+            className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
             {loading ? "Generating..." : `Generate ${currentMode.label}`}
-          </Button>
+          </button>
         </div>
 
         {/* Output */}

@@ -1,15 +1,16 @@
-import React, { useState } from "react";
-import { base44 } from "@/api/api";
+// @ts-nocheck
+import { useState } from "react";
+import api from "../api/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import { Label } from "../components/ui/label";
+import { Textarea } from "../components/ui/textarea";
 import { Search, Plus, Trash2, FileText, Pencil } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { format } from "date-fns";
 
 export default function Notes() {
@@ -22,11 +23,14 @@ export default function Notes() {
 
   const { data: notes = [] } = useQuery({
     queryKey: ["notes"],
-    queryFn: () => base44.entities.Note.list("-updated_date"),
+    queryFn: async () => {
+      const response = await api.get("/notes");
+      return response.data;
+    },
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Note.create(data),
+    mutationFn: (data) => api.post("/notes", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       setForm({ title: "", content: "", subject: "", tags: "" });
@@ -35,15 +39,15 @@ export default function Notes() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Note.update(id, data),
-    onSuccess: (_, vars) => {
+    mutationFn: ({ id, data }) => api.put(`/notes/${id}`, data),
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       setEditing(false);
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Note.delete(id),
+    mutationFn: (id) => api.delete(`/notes/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes"] });
       setSelectedNote(null);

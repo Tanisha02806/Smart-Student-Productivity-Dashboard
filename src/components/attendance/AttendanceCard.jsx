@@ -1,8 +1,8 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
 import { Trash2, Minus, Plus } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 export default function AttendanceCard({ record, onUpdate, onDelete, index }) {
   const percentage = record.total_classes > 0

@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import { base44 } from "@/api/api";
+// @ts-nocheck
+import { useState } from "react";
+import api from "../api/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { Input } from "../components/ui/input";
 import { Search } from "lucide-react";
-import AssignmentCard from "@/components/assignments/AssignmentCard";
-import AddAssignmentDialog from "@/components/assignments/AddAssignmentDialog";
+import AssignmentCard from "../components/assignments/AssignmentCard";
+import AddAssignmentDialog from "../components/assignments/AddAssignmentDialog";
 
 const columns = [
   { key: "todo", label: "To Do", color: "bg-muted-foreground" },
@@ -21,21 +22,21 @@ export default function Assignments() {
 
   const { data: assignments = [] } = useQuery({
     queryKey: ["assignments"],
-    queryFn: () => base44.entities.Assignment.list("-created_date"),
+    queryFn: () => api.get("/assignments?sort=-created_date"),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Assignment.create(data),
+    mutationFn: (data) => api.post("/assignments", data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["assignments"] }),
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Assignment.update(id, data),
+    mutationFn: ({ id, data }) => api.put(`/assignments/${id}`, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["assignments"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Assignment.delete(id),
+    mutationFn: (id) => api.delete(`/assignments/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["assignments"] }),
   });
 

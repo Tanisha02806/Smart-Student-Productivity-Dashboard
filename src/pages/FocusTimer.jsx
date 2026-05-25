@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import { base44 } from "@/api/api";
+// @ts-nocheck
+import { useState, useEffect, useRef, useCallback } from "react";
+import api from "../api/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
 import { Play, Pause, RotateCcw, Coffee, Brain } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../lib/utils";
 import { format } from "date-fns";
 
 const FOCUS_DURATION = 25 * 60;
@@ -21,11 +22,11 @@ export default function FocusTimer() {
 
   const { data: sessions = [] } = useQuery({
     queryKey: ["focusSessions"],
-    queryFn: () => base44.entities.FocusSession.list("-created_date", 20),
+    queryFn: () => api.entities.FocusSession.list("-created_date", 20),
   });
 
   const createSession = useMutation({
-    mutationFn: (data) => base44.entities.FocusSession.create(data),
+    mutationFn: (data) => api.entities.FocusSession.create(data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["focusSessions"] }),
   });
 

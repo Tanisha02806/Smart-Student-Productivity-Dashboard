@@ -1,110 +1,175 @@
-import React, { useState, useEffect } from "react";
-import { base44 } from "@/api/api";
+import { useEffect, useState } from "react";
+import api from "../api/api";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { BookOpen, ClipboardCheck, Timer, CheckCircle2 } from "lucide-react";
-import StatsCard from "@/components/dashboard/StatsCard";
-import UpcomingDeadlines from "@/components/dashboard/UpcomingDeadlines";
-import WeeklyChart from "@/components/dashboard/WeeklyChart";
-import ProductivityScore from "@/components/dashboard/ProductivityScore";
+
+import {
+  BookOpen,
+  ClipboardCheck,
+  Timer,
+  CheckCircle2,
+} from "lucide-react";
+
+import StatsCard from "../components/dashboard/StatsCard";
+import UpcomingDeadlines from "../components/dashboard/UpcomingDeadlines";
+import WeeklyChart from "../components/dashboard/WeeklyChart";
+import ProductivityScore from "../components/dashboard/ProductivityScore";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    base44.auth.me().then(setUser).catch(() => {});
+    async function loadUser() {
+      try {
+        const res = await api.get("/auth/profile");
+
+        setUser(res?.user || res || null);
+      } catch {
+        setUser(null);
+      }
+    }
+
+    loadUser();
   }, []);
 
-  const { data: assignments = [] } = useQuery({
+  const assignmentsQuery = useQuery({
     queryKey: ["assignments"],
-    queryFn: () => base44.entities.Assignment.list("-created_date"),
+    queryFn: async () => {
+      try {
+        return await api.get("/assignments");
+      } catch {
+        return [];
+      }
+    },
   });
 
-  const { data: attendance = [] } = useQuery({
+  const attendanceQuery = useQuery({
     queryKey: ["attendance"],
-    queryFn: () => base44.entities.Attendance.list(),
+    queryFn: async () => {
+      try {
+        return await api.get("/attendance");
+      } catch {
+        return [];
+      }
+    },
   });
 
-  const { data: focusSessions = [] } = useQuery({
-    queryKey: ["focusSessions"],
-    queryFn: () => base44.entities.FocusSession.list("-created_date"),
+  const focusQuery = useQuery({
+    queryKey: ["focus"],
+    queryFn: async () => {
+      try {
+        return await api.get("/focus");
+      } catch {
+        return [];
+      }
+    },
   });
 
-  const completedCount = assignments.filter((a) => a.status === "completed").length;
-  const totalFocusMin = focusSessions
-    .filter((s) => s.session_type === "focus")
-    .reduce((sum, s) => sum + (s.duration_minutes || 0), 0);
-  const avgAttendance = attendance.length > 0
-    ? Math.round(
-        attendance.reduce((s, a) => s + (a.attended_classes / Math.max(a.total_classes, 1)) * 100, 0) /
-          attendance.length
-      )
-    : 0;
+  const assignments = assignmentsQuery.data || [];
+  const attendance = attendanceQuery.data || [];
+  const focusSessions = focusQuery.data || [];
 
-  const firstName = user?.full_name?.split(" ")[0] || "Student";
+  const completedCount = assignments.filter(
+    (a) => a?.status === "completed"
+  ).length;
+
+  const totalFocusMin = focusSessions.reduce(
+    (sum, item) =>
+      sum + (item?.duration_minutes || 0),
+    0
+  );
+
+  const avgAttendance =
+    attendance.length > 0
+      ? Math.round(
+          attendance.reduce(
+            (s, a) =>
+              s +
+              ((a?.attended_classes || 0) /
+                Math.max(a?.total_classes || 1, 1)) *
+                100,
+            0
+          ) / attendance.length
+        )
+      : 0;
+
+  const firstName =
+    user?.full_name?.split(" ")[0] ||
+    user?.name ||
+    "Student";
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
       >
-        <h1 className="text-2xl md:text-3xl font-bold">
-          Welcome back, <span className="text-primary">{firstName}</span> 👋
+        <h1 className="text-3xl font-bold">
+          Welcome back{" "}
+          <span className="text-primary">
+            {firstName}
+          </span>
+          👋
         </h1>
-        <p className="text-muted-foreground mt-1">Here's your academic overview</p>
+
+        <p className="text-muted-foreground">
+          Here's your academic overview
+        </p>
       </motion.div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatsCard
           title="Assignments"
           value={assignments.length}
           subtitle={`${completedCount} completed`}
           icon={BookOpen}
-          colorClass="bg-primary"
-          delay={0}
         />
+
         <StatsCard
           title="Completed"
-          value={`${assignments.length > 0 ? Math.round((completedCount / assignments.length) * 100) : 0}%`}
-          subtitle="Completion rate"
+          value={`${
+            assignments.length
+              ? Math.round(
+                  (completedCount /
+                    assignments.length) *
+                    100
+                )
+              : 0
+          }%`}
           icon={CheckCircle2}
-          colorClass="bg-chart-3"
-          delay={0.1}
         />
+
         <StatsCard
-          title="Focus Time"
-          value={`${Math.round(totalFocusMin / 60)}h`}
-          subtitle={`${totalFocusMin} minutes total`}
+          title="Focus"
+          value={`${Math.round(
+            totalFocusMin / 60
+          )}h`}
           icon={Timer}
-          colorClass="bg-accent"
-          delay={0.2}
         />
+
         <StatsCard
           title="Attendance"
           value={`${avgAttendance}%`}
-          subtitle={`${attendance.length} subjects`}
           icon={ClipboardCheck}
-          colorClass="bg-chart-5"
-          delay={0.3}
         />
       </div>
 
-      {/* Charts and Details */}
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
-          <WeeklyChart focusSessions={focusSessions} />
-          <UpcomingDeadlines assignments={assignments} />
-        </div>
-        <div>
-          <ProductivityScore
-            assignments={assignments}
+        <div className="lg:col-span-2">
+          <WeeklyChart
             focusSessions={focusSessions}
-            attendance={attendance}
+          />
+
+          <UpcomingDeadlines
+            assignments={assignments}
           />
         </div>
+
+        <ProductivityScore
+          assignments={assignments}
+          attendance={attendance}
+          focusSessions={focusSessions}
+        />
       </div>
     </div>
   );

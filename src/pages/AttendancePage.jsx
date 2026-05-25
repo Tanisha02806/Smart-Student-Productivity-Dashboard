@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { base44 } from "@/api/api";
+// @ts-nocheck
+import { useState } from "react";
+import api from "../api/api";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../components/ui/dialog";
+import { Label } from "../components/ui/label";
 import { Plus } from "lucide-react";
-import AttendanceCard from "@/components/attendance/AttendanceCard";
-import AttendanceChart from "@/components/attendance/AttendanceChart";
+import AttendanceCard from "../components/attendance/AttendanceCard";
+import AttendanceChart from "../components/attendance/AttendanceChart";
 
 export default function AttendancePage() {
   const [open, setOpen] = useState(false);
@@ -17,11 +18,11 @@ export default function AttendancePage() {
 
   const { data: attendance = [] } = useQuery({
     queryKey: ["attendance"],
-    queryFn: () => base44.entities.Attendance.list(),
+    queryFn: () => api.get("/attendance"),
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Attendance.create(data),
+    mutationFn: (data) => api.post("/attendance", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["attendance"] });
       setForm({ subject: "", total_classes: 0, attended_classes: 0 });
@@ -30,12 +31,12 @@ export default function AttendancePage() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Attendance.update(id, data),
+    mutationFn: ({ id, data }) => api.put(`/attendance/${id}`, data),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance"] }),
   });
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Attendance.delete(id),
+    mutationFn: (id) => api.delete(`/attendance/${id}`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["attendance"] }),
   });
 

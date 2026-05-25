@@ -1,9 +1,9 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { format, differenceInDays, isPast } from "date-fns";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "../ui/badge";
 import { Clock, AlertTriangle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 const priorityStyles = {
   high: "bg-destructive/10 text-destructive border-destructive/20",
